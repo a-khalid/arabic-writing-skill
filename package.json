@@ -1,0 +1,34 @@
+{
+  "name": "arabic-writing-skill",
+  "version": "0.1.0",
+  "description": "Arabic proofreading and rhetoric skill for AI agents (Agent Skills / SKILL.md) — مدقق لغوي عربي",
+  "license": "MIT",
+  "bin": {
+    "arabic-writing-skill": "bin/install.js"
+  },
+  "files": [
+    "bin/",
+    "skills/"
+  ],
+  "engines": {
+    "node": ">=16.7"
+  },
+  "keywords": [
+    "agent-skills",
+    "claude",
+    "skill",
+    "arabic",
+    "proofreading",
+    "grammar",
+    "rhetoric"
+  ],
+  "author": "Ahmed Khalid",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/a-khalid/arabic-writing-skill.git"
+  },
+  "homepage": "https://github.com/a-khalid/arabic-writing-skill#readme",
+  "bugs": {
+    "url": "https://github.com/a-khalid/arabic-writing-skill/issues"
+  }
+}

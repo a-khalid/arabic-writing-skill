@@ -1,0 +1,95 @@
+#!/usr/bin/env python3
+"""فحص آلي سريع للنص العربي: المسافات، علامات الترقيم، والأخطاء الإملائية المتكررة.
+
+الاستعمال:
+    python3 check_text.py file.txt
+    echo "النص" | python3 check_text.py
+
+الفحص هنا آلي ومحدود؛ وهو مساعد للمدقق لا بديل عنه.
+"""
+import re
+import sys
+
+ARABIC = "\u0621-\u064A\u064B-\u0652\u0671-\u06D3"  # الحروف والحركات فقط (بلا علامات الترقيم)
+
+def w(core):
+    """يطابق الكلمة كاملة (بحدود عربية)."""
+    return r"(?<![" + ARABIC + r"])(?:" + core + r")(?![" + ARABIC + r"])"
+
+
+def wp(core):
+    """مثل w لكن يسمح بسوابق: و، ف، ب، ل، ك."""
+    return w(r"[وفبلك]?(?:" + core + r")")
+
+
+# (نمط، الاقتراح، النوع)
+SPELLING = [
+    (w(r"انشاء\s+الله|إنشاء\s+الله|انشالله|إنشالله|ان\s+شاء\s+الله"), "إن شاء الله", "إملاء"),
+    (wp(r"لاكن"), "لكن", "إملاء"),
+    (wp(r"هاذا|هاذه|هاذان"), "هذا / هذه / هذان", "إملاء"),
+    (wp(r"ذالك"), "ذلك", "إملاء"),
+    (wp(r"شئ|الشئ"), "شيء", "همزة متطرفة"),
+    (w(r"[وف]?الى"), "إلى", "همزة قطع"),
+    (wp(r"انا|انت|انتم|انتما|انتن"), "أنا / أنت / أنتم", "همزة قطع"),
+    (w(r"[وف]?الي"), "إلى (إن لم تكن «آلي» أو «إليّ»)", "إملاء"),
+    (w(r"[وفبل]?(?:ال)?إ(?:ست|خت|جت|لت)[" + ARABIC + r"]+"), "همزة وصل (ا)", "همزة وصل"),
+    (w(r"يدعوا|ندعوا|تدعوا|يرجوا|نرجوا|ترجوا|يسموا|يعلوا|يبدوا"), "حذف الألف الفارقة", "ألف فارقة"),
+    (wp(r"لا\s+زال|لازال"), "ما زال (إن لم تكن للدعاء)", "أسلوب"),
+    (r"سوف\s+لن", "لن", "أسلوب"),
+    (wp(r"بالرغم\s+من"), "على الرغم من", "الأفصح"),
+    (wp(r"جدا"), "جدًا (تنوين النصب)", "إملاء"),
+    (w(r"الغير"), "غير الـ... (الأفصح)", "الأفصح"),
+    (w(r"[وف]?(?:تمّ?ت?|[سو]?[يت]تمّ?)") + r"\s+[" + ARABIC + r"]+", "تحقق: المبني للمجهول المباشر أوجز", "أسلوب"),
+    (w(r"قام|قامت|قاموا|يقوم|تقوم|يقومون") + r"\s+ب[" + ARABIC + r"]+", "تحقق: الفعل المباشر أوجز (قام بزيارة ← زار)", "أسلوب"),
+    (w(r"مسئول[" + ARABIC + r"]*"), "مسؤول (وحّد الكتابة)", "اتساق"),
+]
+
+PUNCT = [
+    (r"(?<=[" + ARABIC + r"])\s*,", "،", "فاصلة لاتينية"),
+    (r"(?<=[" + ARABIC + r"])\s*;", "؛", "فاصلة منقوطة لاتينية"),
+    (r"(?<=[" + ARABIC + r"])\s*\?", "؟", "علامة استفهام لاتينية"),
+    (r"\s+[،؛؟!.:](?!\.)", "حذف المسافة قبل العلامة", "ترقيم"),
+    (r"[،؛؟!](?=[" + ARABIC + r"])", "إضافة مسافة بعد العلامة", "ترقيم"),
+    (r"[؟!]{2,}", "علامة واحدة", "ترقيم"),
+    (r"(?<![" + ARABIC + r"])[وف]\s+(?=[" + ARABIC + r"])", "حرف العطف يتصل بما بعده", "إملاء"),
+    (r"(?<=\S)  +(?=\S)", "مسافة واحدة", "مسافات"),
+]
+
+
+def find_repeated_words(line):
+    out = []
+    for m in re.finditer(r"(?<![" + ARABIC + r"])([" + ARABIC + r"]{2,})\s+\1(?![" + ARABIC + r"])", line):
+        out.append((m.start(), m.group(0), m.group(1), "كلمة مكررة"))
+    return out
+
+
+def check(text):
+    issues = []
+    for ln, line in enumerate(text.splitlines(), 1):
+        for pattern, suggestion, kind in SPELLING + PUNCT:
+            for m in re.finditer(pattern, line):
+                issues.append((ln, m.start() + 1, kind, m.group(0).strip(), suggestion))
+        for col, found, sugg, kind in find_repeated_words(line):
+            issues.append((ln, col + 1, kind, found, sugg))
+    issues.sort()
+    return issues
+
+
+def main():
+    if len(sys.argv) > 1:
+        with open(sys.argv[1], encoding="utf-8") as f:
+            text = f.read()
+    else:
+        text = sys.stdin.read()
+    issues = check(text)
+    if not issues:
+        print("لا ملاحظات آلية.")
+        return 0
+    for ln, col, kind, found, sugg in issues:
+        print(f"{ln}:{col}\t[{kind}]\t«{found}» ← {sugg}")
+    print(f"\nالمجموع: {len(issues)}")
+    return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

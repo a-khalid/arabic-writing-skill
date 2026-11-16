@@ -1,0 +1,11 @@
+{
+  "name": "arabic-writing-skill",
+  "owner": { "name": "Ahmed Khalid" },
+  "plugins": [
+    {
+      "name": "arabic-writing",
+      "source": "./",
+      "description": "مدقق لغوي عربي: تصحيح الإملاء والنحو والترقيم، ومراجعة التركيب، والصياغة البلاغية"
+    }
+  ]
+}

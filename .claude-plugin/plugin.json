@@ -1,0 +1,18 @@
+{
+  "name": "arabic-writing",
+  "version": "0.1.0",
+  "description": "مدقق لغوي عربي: تصحيح الإملاء والنحو والترقيم، ومراجعة التركيب، والصياغة البلاغية",
+  "license": "MIT",
+  "keywords": [
+    "arabic",
+    "proofreading",
+    "grammar",
+    "rhetoric",
+    "عربي",
+    "تدقيق"
+  ],
+  "author": {
+    "name": "Ahmed Khalid"
+  },
+  "repository": "https://github.com/a-khalid/arabic-writing-skill"
+}
