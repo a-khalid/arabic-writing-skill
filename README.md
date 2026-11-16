@@ -58,6 +58,11 @@ npx arabic-writing-skill
 
 يمكن أيضًا تثبيته عامًّا: `npm install -g arabic-writing-skill` ثم `arabic-writing-skill`.
 
+أو تشغيله مباشرة من GitHub دون انتظار النشر على npm:
+```bash
+npx github:a-khalid/arabic-writing-skill
+```
+
 ### الطريقة ٣: إضافة Claude Code (Plugin)
 ```bash
 /plugin marketplace add a-khalid/arabic-writing-skill
