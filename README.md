@@ -1,5 +1,7 @@
 # المدقق اللغوي العربي — Arabic Writing Skill
 
+[![Listed in Awesome Agent Skills](https://sagargupta.online/awesome-skills/badge.svg)](https://github.com/Sagargupta16/awesome-skills)
+
 مهارة (Skill) مفتوحة المصدر لنماذج الذكاء الاصطناعي، مثل Claude، تعمل عمل **مدقق لغوي ومحرر عربي**:
 
 - ✅ **تصحيح الإملاء**: الهمزات، والتاء المربوطة والهاء، والألف المقصورة، وألف التنوين، والألف الفارقة.
